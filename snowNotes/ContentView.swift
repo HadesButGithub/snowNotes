@@ -40,12 +40,23 @@ struct EditTitleTip: Tip {
     }
 }
 
+struct EditTextTip: Tip {
+    var title: Text {
+        Text("Write a Note")
+    }
+    
+    var message: Text? {
+        Text("Tap in the text box to edit your note.")
+    }
+    
+    var image: Image? {
+        Image(systemName: "note.text")
+    }
+}
+
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
-    
-    var editTitleTip = EditTitleTip()
-    var shouldResetTips = true
 
     var body: some View {
         NavigationSplitView {
@@ -61,7 +72,13 @@ struct ContentView: View {
             List {
                 ForEach(items) { item in
                     NavigationLink(destination: EditNoteView(viewModel: NoteViewModel(item: item))) {
+                        VStack(alignment: .leading){
                             Text(item.noteTitle)
+                            Text("\(item.timestamp, format: .dateTime)")
+                                .fontDesign(.monospaced)
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
                     }
                 }
                 .onDelete(perform: deleteItems)
@@ -106,10 +123,13 @@ struct ContentView: View {
 
 struct EditNoteView: View {
     @ObservedObject var viewModel: NoteViewModel
+    var editTitleTip = EditTitleTip()
+    var editTextTip = EditTextTip()
+    var shouldResetTips = true
 
     var body: some View {
         VStack {
-            TextField("Placeholder", text: $viewModel.item.noteTitle)
+            TextField("Title", text: $viewModel.item.noteTitle)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.leading)
                 .lineLimit(1)
@@ -117,12 +137,39 @@ struct EditNoteView: View {
                 .fontWidth(.standard)
                 .font(.title)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .popoverTip(EditTitleTip())
+                .popoverTip(editTitleTip)
+                .onTapGesture {
+                    editTitleTip.invalidate(reason: .actionPerformed)
+                }
+            
+            Text("Created at \(viewModel.item.timestamp, format: .dateTime)")
+                .fontWeight(.medium)
+                .multilineTextAlignment(.leading)
+                .lineLimit(1)
+                .padding(.leading, 15.0)
+                .fontWidth(.standard)
+                .font(.footnote)
+                .fontDesign(.monospaced)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             TextEditor(text: $viewModel.item.noteContent)
                 .multilineTextAlignment(.leading)
                 .padding(.leading, 10.0)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                //.popoverTip(editTextTip)
+                //.onTapGesture {
+                //    editTextTip.invalidate(reason: .actionPerformed)
+                //}
+        }
+        .task {
+            if shouldResetTips {
+                try? Tips.resetDatastore()
+            }
+        
+            try? Tips.configure([
+                .displayFrequency(.immediate),
+                .datastoreLocation(.applicationDefault)
+            ])
         }
         .onChange(of: viewModel.item.noteTitle) { _ in
             viewModel.save()
