@@ -127,7 +127,7 @@ struct EditNoteView: View {
     @ObservedObject var viewModel: NoteViewModel
     var editTitleTip = EditTitleTip()
     var editTextTip = EditTextTip()
-    var shouldResetTips = true
+    @State var shouldResetTips = false
     
     var body: some View {
         VStack {
