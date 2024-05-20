@@ -83,6 +83,7 @@ struct ContentView: View {
                 }
                 .onDelete(perform: deleteItems)
             }
+            .scrollContentBackground(.visible)
             .overlay(content: {
                 if items.isEmpty {
                     Text("Click the + to create a new note.")
@@ -104,10 +105,11 @@ struct ContentView: View {
             Text("Select an item")
         }
     }
+    
 
     private func addItem() {
         withAnimation {
-            let newItem = Item(timestamp: Date(), noteContent: "Hello world!", noteTitle: "New Note")
+            let newItem = Item(timestamp: Date(), noteAccessed: Date(), noteContent: "Hello world!", noteTitle: "New Note")
             modelContext.insert(newItem)
         }
     }
@@ -126,7 +128,7 @@ struct EditNoteView: View {
     var editTitleTip = EditTitleTip()
     var editTextTip = EditTextTip()
     var shouldResetTips = true
-
+    
     var body: some View {
         VStack {
             TextField("Title", text: $viewModel.item.noteTitle)
@@ -151,15 +153,21 @@ struct EditNoteView: View {
                 .font(.footnote)
                 .fontDesign(.monospaced)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Text("Last modified at \(viewModel.item.noteAccessed, format: .dateTime)")
+                .fontWeight(.medium)
+                .multilineTextAlignment(.leading)
+                .lineLimit(1)
+                .padding(.leading, 15.0)
+                .fontWidth(.standard)
+                .font(.footnote)
+                .fontDesign(.monospaced)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             TextEditor(text: $viewModel.item.noteContent)
                 .multilineTextAlignment(.leading)
                 .padding(.leading, 10.0)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                //.popoverTip(editTextTip)
-                //.onTapGesture {
-                //    editTextTip.invalidate(reason: .actionPerformed)
-                //}
         }
         .task {
             if shouldResetTips {
@@ -172,9 +180,11 @@ struct EditNoteView: View {
             ])
         }
         .onChange(of: viewModel.item.noteTitle) { _ in
+            viewModel.item.noteAccessed = Date()
             viewModel.save()
         }
         .onChange(of: viewModel.item.noteContent) { _ in
+            viewModel.item.noteAccessed = Date()
             viewModel.save()
         }
     }
