@@ -26,6 +26,23 @@ class NoteViewModel: ObservableObject {
     }
 }
 
+class SettingsModel: ObservableObject {
+    @Published var toggle: Item
+    @Environment(\.managedObjectContext) private var managedObjectContext
+
+    init(toggle: Item) {
+        self.toggle = toggle
+    }
+
+    func save() {
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Error saving changes: \(error)")
+        }
+    }
+}
+
 struct EditTitleTip: Tip {
     var title: Text {
         Text("Create a Title")
@@ -38,6 +55,10 @@ struct EditTitleTip: Tip {
     var image: Image? {
         Image(systemName: "pencil.line")
     }
+    
+    var options: [Option] {
+           MaxDisplayCount(1)
+       }
 }
 
 struct EditTextTip: Tip {
@@ -57,6 +78,7 @@ struct EditTextTip: Tip {
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
+    @State private var showSettings = false
 
     var body: some View {
         NavigationSplitView {
@@ -90,21 +112,31 @@ struct ContentView: View {
                         .foregroundColor(Color.gray)
                 }
             })
-            
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
+                ToolbarItem {
+                    Button(action: {
+                        showSettings.toggle()
+                    }) {
+                        Label("Settings", systemImage: "gear")
+                    }
+                }
+                ToolbarItem {
+                    EditButton()
+                }
             }
         } detail: {
-            Text("Select an item")
+            Text("Select a note.")
         }
+        .sheet(isPresented: $showSettings, content: {
+            SettingsView()
+        })
     }
+    
     
 
     private func addItem() {
@@ -123,11 +155,32 @@ struct ContentView: View {
     }
 }
 
+struct SettingsView: View {
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("Settings")
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(1)
+                    .padding(.top, 30.0)
+                    .padding(.leading, 15.0)
+                    .fontWidth(.expanded)
+                    .font(.title)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer()
+                Text("hello!")
+                Spacer()
+            }
+        }
+    }
+}
+
 struct EditNoteView: View {
     @ObservedObject var viewModel: NoteViewModel
     var editTitleTip = EditTitleTip()
     var editTextTip = EditTextTip()
-    @State var shouldResetTips = false
+    var shouldResetTips = true
     
     var body: some View {
         VStack {
@@ -170,7 +223,7 @@ struct EditNoteView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .task {
-            if shouldResetTips {
+            if shouldResetTips == true {
                 try? Tips.resetDatastore()
             }
         
