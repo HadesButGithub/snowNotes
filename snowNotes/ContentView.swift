@@ -4,51 +4,54 @@
 //
 //  Created by Harry Lewandowski on 19/5/2024.
 //
+// Why was the JavaScript developer sad?
+// Because he didn't know how to ﻿null his emotions.
 
 import SwiftUI
 import SwiftData
 import TipKit
 
+// Defines storage model for notes
 class NoteViewModel: ObservableObject {
     @Published var item: Item
     @Environment(\.managedObjectContext) private var managedObjectContext
 
     init(item: Item) {
-        self.item = item
+        self.item = item // initiates data type item as itself
     }
 
-    func save() {
+    func save() { // Called to save content to internal storage
         do {
-            try managedObjectContext.save()
+            try managedObjectContext.save() // attempts to save
         } catch {
-            print("Error saving note: \(error)")
+            print("Error saving note: \(error)") // prints error if unable to save
         }
     }
 }
 
 class appOptions: ObservableObject {
-    @AppStorage("creationOnHome") var creationOnHome = false
+    @AppStorage("creationOnHome") var creationOnHome = false // Sets default for setting that displays date of creation on home screen
 }
 
-struct EditTitleTip: Tip {
+struct EditTitleTip: Tip { // Defines hint displayed on first launch
     var title: Text {
-        Text("Create a Title")
+        Text("Create a Title") // Title of hint
     }
     
     var message: Text? {
-        Text("Tap on the title of your note to change it.")
+        Text("Tap on the title of your note to change it.") // Message displayed in hint
     }
     
     var image: Image? {
-        Image(systemName: "pencil.line")
+        Image(systemName: "pencil.line") // Image used within hint defined from SF Symbols
     }
     
     var options: [Option] {
-           MaxDisplayCount(1)
+           MaxDisplayCount(1) // Restricts the hint to display once
        }
 }
 
-struct EditTextTip: Tip {
+struct EditTextTip: Tip { // Defines hint on how to edit a note, unused
     var title: Text {
         Text("Write a Note")
     }
@@ -62,18 +65,18 @@ struct EditTextTip: Tip {
     }
 }
 
-struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-    @State private var showSettings = false
-    @ObservedObject var option: appOptions = appOptions()
+struct ContentView: View { // Defines main UI view
+    @Environment(\.modelContext) private var modelContext // Loads stored notes into memory
+    @Query private var items: [Item] // Sets var items into an array of the notes stored in the modelContext
+    @State private var showSettings = false // Defines whether Settings sheet appears
+    @ObservedObject var option: appOptions = appOptions() // Links stored settings values to ContentView
     
     var body: some View {
-        @State var creationOnHomeCV = option.creationOnHome
+        @State var creationOnHomeCV = option.creationOnHome // Link to config for whether creation date appears on home screen
 
-        NavigationSplitView {
-            Text("snowNotes")
-                .fontWeight(.bold)
+        NavigationSplitView { // View that allows for navigation between Views
+            Text("snowNotes") // UI definition for "snowNotes" heading
+                .fontWeight(.bold) // Text properties
                 .multilineTextAlignment(.leading)
                 .lineLimit(1)
                 .padding(.leading, 15.0)
@@ -81,16 +84,16 @@ struct ContentView: View {
                 .font(.title)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            List {
-                ForEach(items) { item in
-                    NavigationLink(destination: EditNoteView(viewModel: NoteViewModel(item: item))) {
-                        VStack(alignment: .leading){
-                            Text(item.noteTitle)
-                            Text("Last modified \(item.noteAccessed, format: .dateTime)")
+            List { // Lists all notes in context
+                ForEach(items) { item in // Creates item in List for each item in modelContext
+                    NavigationLink(destination: EditNoteView(viewModel: NoteViewModel(item: item))) { // Opens EditNoteView with values of the selected item from modelContext
+                        VStack(alignment: .leading){ // Defines UI for each item in List
+                            Text(item.noteTitle) // Adds title to items
+                            Text("Last modified \(item.noteAccessed, format: .dateTime)") // Adds date the note was last changed
                                 .fontDesign(.monospaced)
                                 .font(.caption)
                                 .foregroundColor(.gray)
-                            if creationOnHomeCV == true {
+                            if creationOnHomeCV == true { // Adds creation date if creationOnHome is enabled
                                 Text("Last created \(item.timestamp, format: .dateTime)")
                                     .fontDesign(.monospaced)
                                     .font(.caption)
@@ -99,16 +102,16 @@ struct ContentView: View {
                         }
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: deleteItems) // Runs deleteItems function if item is deleted
             }
             .scrollContentBackground(.visible)
-            .overlay(content: {
+            .overlay(content: { // Defines UI shown if no notes exist
                 if items.isEmpty {
-                    Text("Click the + to create a new note.")
+                    Text("Click the + to create a new note.") // Text and text formatting
                         .foregroundColor(Color.gray)
                 }
             })
-            .toolbar {
+            .toolbar { // Defines buttons shown in toolbar
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
