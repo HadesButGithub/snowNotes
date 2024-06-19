@@ -26,21 +26,8 @@ class NoteViewModel: ObservableObject {
     }
 }
 
-class SettingsModel: ObservableObject {
-    @Published var toggle: Item
-    @Environment(\.managedObjectContext) private var managedObjectContext
-
-    init(toggle: Item) {
-        self.toggle = toggle
-    }
-
-    func save() {
-        do {
-            try managedObjectContext.save()
-        } catch {
-            print("Error saving changes: \(error)")
-        }
-    }
+class appOptions: ObservableObject {
+    @AppStorage("creationOnHome") var creationOnHome = false
 }
 
 struct EditTitleTip: Tip {
@@ -67,7 +54,7 @@ struct EditTextTip: Tip {
     }
     
     var message: Text? {
-        Text("Tap in the text box to edit your note.")
+        Text("Tap inside the text box to edit your note.")
     }
     
     var image: Image? {
@@ -79,8 +66,11 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     @State private var showSettings = false
-
+    @ObservedObject var option: appOptions = appOptions()
+    
     var body: some View {
+        @State var creationOnHomeCV = option.creationOnHome
+
         NavigationSplitView {
             Text("snowNotes")
                 .fontWeight(.bold)
@@ -96,10 +86,16 @@ struct ContentView: View {
                     NavigationLink(destination: EditNoteView(viewModel: NoteViewModel(item: item))) {
                         VStack(alignment: .leading){
                             Text(item.noteTitle)
-                            Text("\(item.timestamp, format: .dateTime)")
+                            Text("Last modified \(item.noteAccessed, format: .dateTime)")
                                 .fontDesign(.monospaced)
                                 .font(.caption)
                                 .foregroundColor(.gray)
+                            if creationOnHomeCV == true {
+                                Text("Last created \(item.timestamp, format: .dateTime)")
+                                    .fontDesign(.monospaced)
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
                         }
                     }
                 }
@@ -156,7 +152,10 @@ struct ContentView: View {
 }
 
 struct SettingsView: View {
+    @ObservedObject var option: appOptions = appOptions()
+
     var body: some View {
+        @State var creationOnHomeSettings = option.creationOnHome
         NavigationView {
             VStack {
                 Text("Settings")
@@ -169,8 +168,13 @@ struct SettingsView: View {
                     .font(.title)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
-                Text("hello!")
+                Text("Settings")
+                    .font(.title)
+                Toggle(isOn: $creationOnHomeSettings) {
+                        Text("Display Creation Date on Home Screen")
+                    }
                 Spacer()
+                Text("hello world!")
             }
         }
     }

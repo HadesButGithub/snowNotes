@@ -15,7 +15,23 @@
 		4AAE59572BFB2267007A8701 /* extension_icon-2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4AAE59562BFB2266007A8701 /* extension_icon-2.png */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		4A02FD4A2C1802FE0049FF78 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		4A02FD362C1802FB0049FF78 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		4A02FD382C1802FC0049FF78 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		4A4E975D2C22706B00C3CA24 /* snowNotes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = snowNotes.entitlements; sourceTree = "<group>"; };
 		4A9412DE2BF9FA53004A9F74 /* snowNotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = snowNotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A9412E12BF9FA53004A9F74 /* snowNotesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = snowNotesApp.swift; sourceTree = "<group>"; };
 		4A9412E32BF9FA53004A9F74 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -36,10 +52,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4A02FD352C1802FB0049FF78 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4A02FD362C1802FB0049FF78 /* WidgetKit.framework */,
+				4A02FD382C1802FC0049FF78 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		4A9412D52BF9FA53004A9F74 = {
 			isa = PBXGroup;
 			children = (
 				4A9412E02BF9FA53004A9F74 /* snowNotes */,
+				4A02FD352C1802FB0049FF78 /* Frameworks */,
 				4A9412DF2BF9FA53004A9F74 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -55,6 +81,7 @@
 		4A9412E02BF9FA53004A9F74 /* snowNotes */ = {
 			isa = PBXGroup;
 			children = (
+				4A4E975D2C22706B00C3CA24 /* snowNotes.entitlements */,
 				4A9412E12BF9FA53004A9F74 /* snowNotesApp.swift */,
 				4A9412E32BF9FA53004A9F74 /* ContentView.swift */,
 				4A9412E52BF9FA53004A9F74 /* Item.swift */,
@@ -83,6 +110,7 @@
 				4A9412DA2BF9FA53004A9F74 /* Sources */,
 				4A9412DB2BF9FA53004A9F74 /* Frameworks */,
 				4A9412DC2BF9FA53004A9F74 /* Resources */,
+				4A02FD4A2C1802FE0049FF78 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -100,7 +128,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					4A9412DD2BF9FA53004A9F74 = {
@@ -277,6 +305,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = snowNotes/snowNotes.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"snowNotes/Preview Content\"";
@@ -298,12 +327,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lol.flareon.snowNotes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 1.0;
 			};
 			name = Debug;
@@ -313,6 +342,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = snowNotes/snowNotes.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"snowNotes/Preview Content\"";
@@ -334,12 +364,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = lol.flareon.snowNotes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 1.0;
 			};
 			name = Release;
