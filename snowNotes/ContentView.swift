@@ -67,6 +67,15 @@ struct ContentView: View { // Defines main UI view
     @State private var showSettings = false // Defines whether Settings sheet appears
     
     var body: some View {
+        var noteCount = items.count
+        var noteCountTitle: String {
+            if noteCount == 1 {
+                return "note"
+            } else {
+                return "notes"
+            }
+        }
+        
         NavigationSplitView { // View that allows for navigation between Views
             Text("snowNotes") // UI definition for "snowNotes" heading
                 .fontWeight(.bold) // Text properties
@@ -75,6 +84,14 @@ struct ContentView: View { // Defines main UI view
                 .padding(.leading, 15.0)
                 .fontWidth(.expanded)
                 .font(.title)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("\(noteCount) \(noteCountTitle)")
+                .multilineTextAlignment(.leading)
+                .lineLimit(1)
+                .padding(.leading, 15.0)
+                .fontWidth(.standard)
+                .fontDesign(.monospaced)
+                .foregroundColor(.gray)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             List { // Lists all notes in context
@@ -142,6 +159,12 @@ struct ContentView: View { // Defines main UI view
 }
 
 struct SettingsView: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var debugQuanitityNoteCount = 0
+    @State private var displayDebugAlert = false
+    @State private var alertTitle = "Alert Title"
+    @State private var alertMessage = "Alert Message"
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -155,13 +178,55 @@ struct SettingsView: View {
                     .font(.title)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Spacer()
-                Text("Settings")
-                    .font(.title)
+                Stepper(value: $debugQuanitityNoteCount, in: 0...500) {
+                    Text("Debug: Quantity Note Creation")
+                }.padding()
+                Text("\(debugQuanitityNoteCount)")
+                Button("Create Notes") {
+                    debugCreateQuantityNotes()
+                }
                 Spacer()
-                Text("hello world!")
+                
+                Button(action: {
+                    resetAllData()
+                }) {
+                    Text("Reset All Data")
+                        .foregroundColor(.red)
+                        .fontWeight(.bold)
+                }
+                Spacer()
             }
+        }.alert(isPresented: $displayDebugAlert) {
+            Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
+    
+    func debugCreateQuantityNotes() {
+        var notesCreated = 1
+        
+        while notesCreated <= debugQuanitityNoteCount {
+            let newItem = Item(timestamp: Date(), noteAccessed: Date(), noteContent: "Hello world!", noteTitle: "Debug Note \(notesCreated)")
+            modelContext.insert(newItem)
+            notesCreated += 1
+        }
+        alertTitle = "Created Notes"
+        alertMessage = "\(debugQuanitityNoteCount) have been created."
+        displayDebugAlert = true
+        notesCreated = 0
+        debugQuanitityNoteCount = 0
+    }
+    
+    func resetAllData() {
+        do {
+            try modelContext.delete(model: Item.self)
+            alertTitle = "Deleted All Notes"
+            alertMessage = "All notes have been deleted. Quit the app from the App Switcher to apply changes."
+            displayDebugAlert = true
+        } catch {
+            print("Failed to delete notes.")
+        }
+    }
+    
 }
 
 struct EditNoteView: View {
