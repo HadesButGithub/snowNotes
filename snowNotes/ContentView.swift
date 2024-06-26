@@ -29,10 +29,6 @@ class NoteViewModel: ObservableObject {
     }
 }
 
-class appOptions: ObservableObject {
-    @AppStorage("creationOnHome") var creationOnHome = false // Sets default for setting that displays date of creation on home screen
-}
-
 struct EditTitleTip: Tip { // Defines hint displayed on first launch
     var title: Text {
         Text("Create a Title") // Title of hint
@@ -69,11 +65,8 @@ struct ContentView: View { // Defines main UI view
     @Environment(\.modelContext) private var modelContext // Loads stored notes into memory
     @Query private var items: [Item] // Sets var items into an array of the notes stored in the modelContext
     @State private var showSettings = false // Defines whether Settings sheet appears
-    @ObservedObject var option: appOptions = appOptions() // Links stored settings values to ContentView
     
     var body: some View {
-        @State var creationOnHomeCV = option.creationOnHome // Link to config for whether creation date appears on home screen
-
         NavigationSplitView { // View that allows for navigation between Views
             Text("snowNotes") // UI definition for "snowNotes" heading
                 .fontWeight(.bold) // Text properties
@@ -93,12 +86,6 @@ struct ContentView: View { // Defines main UI view
                                 .fontDesign(.monospaced)
                                 .font(.caption)
                                 .foregroundColor(.gray)
-                            if creationOnHomeCV == true { // Adds creation date if creationOnHome is enabled
-                                Text("Last created \(item.timestamp, format: .dateTime)")
-                                    .fontDesign(.monospaced)
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                            }
                         }
                     }
                 }
@@ -155,10 +142,7 @@ struct ContentView: View { // Defines main UI view
 }
 
 struct SettingsView: View {
-    @ObservedObject var option: appOptions = appOptions()
-
     var body: some View {
-        @State var creationOnHomeSettings = option.creationOnHome
         NavigationView {
             VStack {
                 Text("Settings")
@@ -173,9 +157,6 @@ struct SettingsView: View {
                 Spacer()
                 Text("Settings")
                     .font(.title)
-                Toggle(isOn: $creationOnHomeSettings) {
-                        Text("Display Creation Date on Home Screen")
-                    }
                 Spacer()
                 Text("hello world!")
             }
@@ -187,7 +168,7 @@ struct EditNoteView: View {
     @ObservedObject var viewModel: NoteViewModel
     var editTitleTip = EditTitleTip()
     var editTextTip = EditTextTip()
-    var shouldResetTips = true
+    var shouldResetTips = false
     
     var body: some View {
         VStack {
